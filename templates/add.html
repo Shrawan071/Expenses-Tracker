@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<form method="POST">
+    <input type="text" name="title" placeholder="Expense Title" required>
+    <input type="number" step="0.01" name="amount" placeholder="Amount" required>
+    <select name="category">
+        <option>Food</option>
+        <option>Travel</option>
+        <option>Shopping</option>
+        <option>Other</option>
+    </select>
+    <input type="date" name="date" required>
+    <button type="submit">Add Expense</button>
+</form>
+{% endblock %}
