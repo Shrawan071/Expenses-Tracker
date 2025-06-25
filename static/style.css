@@ -1,90 +1,215 @@
+/* General Reset */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(to right, #e0f7fa, #ffffff);
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f5f7fa;
     color: #333;
 }
 
 .container {
-    width: 90%;
     max-width: 1000px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    padding: 1rem;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 2rem;
-    color: #00796b;
-}
-
-form input, form select, form button {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    transition: border 0.3s ease;
-}
-
-form input:focus, form select:focus {
-    border-color: #00796b;
-    outline: none;
-}
-
-form button {
-    background-color: #00796b;
-    color: white;
+/* Buttons */
+.btn {
+    padding: 0.5rem 1rem;
     border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s ease;
+    display: inline-block;
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+    text-align: center;
 }
 
-form button:hover {
-    background-color: #004d40;
+.btn-primary { background: #2c3e50; color: #fff; }
+.btn-secondary { background: #7f8c8d; color: #fff; }
+.btn-edit { background: #3498db; color: #fff; margin-right: 0.5rem; }
+.btn-danger { background: #e74c3c; color: #fff; }
+
+.btn:hover {
+    filter: brightness(1.1);
 }
 
-table {
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Forms */
+.expense-form, .budget-form {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
+    margin: 1rem auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #fdfdfd;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.expense-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 2rem;
-    background-color: #fafafa;
-    border-radius: 8px;
-    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-table thead {
-    background-color: #00796b;
-    color: white;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 12px;
+.expense-table th,
+.expense-table td {
+    padding: 0.75rem;
     text-align: left;
+    border-bottom: 1px solid #eee;
 }
 
-tr:nth-child(even) {
-    background-color: #f1f1f1;
-}
-
-tr:hover {
-    background-color: #e0f2f1;
-}
-
-.total {
+.expense-table th {
+    background-color: #ecf0f1;
     font-weight: bold;
-    margin-top: 1.5rem;
-    font-size: 1.2rem;
-    color: #004d40;
-    text-align: right;
+}
+
+.expense-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Summary Display */
+.summary {
+    background: #ecf0f1;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Header Row */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+}
+
+/* History Page */
+.history-record {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.history-record h3 {
+    margin-top: 0;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+    .btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        font-size: 0.95rem;
+    }
+
+    .header-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .expense-table th,
+    .expense-table td {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+}
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .container {
+    background-color: #1e1e1e;
+}
+
+body.dark-mode .expense-table {
+    background-color: #222;
+    color: #ddd;
+}
+
+body.dark-mode .expense-table th {
+    background-color: #333;
+    color: #eee;
+}
+
+body.dark-mode .expense-table tr:hover {
+    background-color: #333;
+}
+
+body.dark-mode .expense-form,
+body.dark-mode .budget-form,
+body.dark-mode .history-record,
+body.dark-mode .summary {
+    background-color: #1e1e1e;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    color: #ddd;
+}
+
+body.dark-mode .btn-primary {
+    background: #0d47a1;
+    color: #fff;
+}
+
+body.dark-mode .btn-secondary {
+    background: #616161;
+    color: #fff;
+}
+
+body.dark-mode .btn-edit {
+    background: #1976d2;
+    color: #fff;
+}
+
+body.dark-mode .btn-danger {
+    background: #d32f2f;
+    color: #fff;
+}
+
+/* Optional: smoother transition */
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
 }

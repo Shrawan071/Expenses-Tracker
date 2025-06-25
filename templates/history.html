@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>📜 Past Month Expenses</h2>
+
+{% for month, records in history.items() %}
+<div class="month-record">
+    <h3>{{ month }}</h3>
+    <p><strong>Budget:</strong> Rs. {{ records.budget }}</p>
+    <p><strong>Total Expenses:</strong> Rs. {{ records.total }}</p>
+
+    <table class="expense-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date of Expenditure</th>
+                <th>Entry Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in records.expenses %}
+            <tr>
+                <td>{{ e.title }}</td>
+                <td>Rs. {{ e.amount }}</td>
+                <td>{{ e.category }}</td>
+                <td>{{ e.date }}</td>
+                <td>{{ e.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+{% endblock %}

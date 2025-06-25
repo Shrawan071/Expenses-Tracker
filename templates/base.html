@@ -1,14 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Expense Tracker</title>
-     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
     <div class="container">
-        <h1>Expense Tracker</h1>
-        {% block content %}
-        {% endblock %}
+        <div class="header-row" style="align-items: center; justify-content: space-between;">
+            <h1>Expense Tracker</h1>
+            <button id="dark-mode-toggle" class="btn btn-secondary" type="button">🌙 Dark Mode</button>
+        </div>
+        {% block content %}{% endblock %}
     </div>
+
+    <script>
+      const toggleBtn = document.getElementById('dark-mode-toggle');
+      const body = document.body;
+
+      // Load saved mode on page load
+      if(localStorage.getItem('darkMode') === 'enabled') {
+        body.classList.add('dark-mode');
+        toggleBtn.textContent = '☀️ Light Mode';
+      }
+
+      toggleBtn.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        if(body.classList.contains('dark-mode')) {
+          toggleBtn.textContent = '☀️ Light Mode';
+          localStorage.setItem('darkMode', 'enabled');
+        } else {
+          toggleBtn.textContent = '🌙 Dark Mode';
+          localStorage.setItem('darkMode', 'disabled');
+        }
+      });
+    </script>
 </body>
 </html>

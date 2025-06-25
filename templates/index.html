@@ -1,26 +1,95 @@
 {% extends 'base.html' %}
 {% block content %}
-<a href="/add">Add New Expense</a>
-<table>
-    <tr>
-        <th>Title</th>
-        <th>Amount</th>
-        <th>Category</th>
-        <th>Date of Expenditure</th>
-        <th>Actions</th>
-    </tr>
-    {% for e in expenses %}
-    <tr>
-        <td>{{ e.title }}</td>
-        <td>Rs. {{ e.amount }}</td>
-        <td>{{ e.category }}</td>
-        <td>{{ e.date }}</td>
-        <td>
-            <a href="/edit/{{ e.id }}">Edit</a> |
-            <a href="/delete/{{ e.id }}">Delete</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-<p class="total">Total Expenses: Rs. {{ total }}</p>
+
+<!-- Budget Entry Options -->
+<div class="budget-form">
+    <form action="/set_budget" method="POST">
+        <label>Choose Budget Tracking Mode:</label>
+        <select name="mode" required onchange="toggleModeFields(this.value)">
+            <option value="current">Current Month</option>
+            <option value="range">Custom Range</option>
+            <option value="select">Choose Month-Year</option>
+        </select>
+
+        <div id="range-fields" style="display: none;">
+            <label>From:</label>
+            <input type="date" name="from">
+            <label>To:</label>
+            <input type="date" name="to">
+        </div>
+
+        <div id="select-fields" style="display: none;">
+            <label>Month:</label>
+            <select name="month">
+                {% for m in range(1,13) %}
+                <option value="{{ m }}">{{ m }}</option>
+                {% endfor %}
+            </select>
+            <label>Year:</label>
+            <input type="number" name="year" min="2000" max="2100">
+        </div>
+
+        <input type="number" name="budget" placeholder="Enter budget" required>
+        <button type="submit" class="btn btn-primary">Set Budget</button>
+    </form>
+</div>
+
+<script>
+function toggleModeFields(mode) {
+    document.getElementById('range-fields').style.display = (mode === 'range') ? 'block' : 'none';
+    document.getElementById('select-fields').style.display = (mode === 'select') ? 'block' : 'none';
+}
+</script>
+
+<!-- Summary -->
+{% if budget %}
+<div class="summary">
+    <p><strong>Mode:</strong> {{ mode_display }}</p>
+    <p><strong>Budget:</strong> Rs. {{ budget }}</p>
+    <p><strong>Total Expenses:</strong> Rs. {{ total }}</p>
+    <p><strong>Remaining:</strong> Rs. {{ budget - total }}</p>
+</div>
+{% endif %}
+
+<div class="header-row">
+    <a href="/add" class="btn btn-primary">➕ Add Expense</a>
+    <a href="/history" class="btn btn-secondary">📜 View History</a>
+</div>
+
+<!-- Expense Table -->
+<div class="table-container">
+    <table class="expense-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Entry Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in expenses %}
+            <tr>
+                <td>{{ e.title }}</td>
+                <td>{{ e.quantity or '' }}</td>
+                <td>{{ e.rate or '' }}</td>
+                <td>Rs. {{ e.amount }}</td>
+                <td>{{ e.category }}</td>
+                <td>{{ e.date }}</td>
+                <td>{{ e.created_at }}</td>
+                <td>
+                    <div class="action-group">
+                        <a href="/edit/{{ e.id }}" class="btn btn-edit">Edit</a>
+                        <a href="/delete/{{ e.id }}" class="btn btn-danger">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
