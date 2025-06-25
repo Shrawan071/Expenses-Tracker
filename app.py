@@ -13,6 +13,11 @@ class Expense(db.Model):
     amount = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(50), nullable=False)
     date = db.Column(db.Date, nullable=False)
+    
+
+with app.app_context():
+    db.create_all()
+
 
 @app.route('/')
 def index():

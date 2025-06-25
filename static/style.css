@@ -1,40 +1,90 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background: linear-gradient(to right, #e0f7fa, #ffffff);
+    color: #333;
 }
+
 .container {
-    width: 80%;
-    margin: auto;
-    overflow: hidden;
+    width: 90%;
+    max-width: 1000px;
+    margin: 2rem auto;
     padding: 2rem;
-    background: white;
-    margin-top: 2rem;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
+
 h1 {
     text-align: center;
+    margin-bottom: 2rem;
+    color: #00796b;
 }
+
 form input, form select, form button {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
     border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: border 0.3s ease;
 }
+
+form input:focus, form select:focus {
+    border-color: #00796b;
+    outline: none;
+}
+
+form button {
+    background-color: #00796b;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #004d40;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 2rem;
+    background-color: #fafafa;
+    border-radius: 8px;
+    overflow: hidden;
 }
+
+table thead {
+    background-color: #00796b;
+    color: white;
+}
+
 table, th, td {
     border: 1px solid #ddd;
 }
+
 th, td {
-    padding: 10px;
+    padding: 12px;
     text-align: left;
 }
+
+tr:nth-child(even) {
+    background-color: #f1f1f1;
+}
+
+tr:hover {
+    background-color: #e0f2f1;
+}
+
 .total {
     font-weight: bold;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    font-size: 1.2rem;
+    color: #004d40;
+    text-align: right;
 }
