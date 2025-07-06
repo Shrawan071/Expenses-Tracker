@@ -1,95 +1,110 @@
 {% extends 'base.html' %}
+
 {% block content %}
+<h1>Expense Tracker</h1>
 
-<!-- Budget Entry Options -->
-<div class="budget-form">
-    <form action="/set_budget" method="POST">
-        <label>Choose Budget Tracking Mode:</label>
-        <select name="mode" required onchange="toggleModeFields(this.value)">
-            <option value="current">Current Month</option>
-            <option value="range">Custom Range</option>
-            <option value="select">Choose Month-Year</option>
-        </select>
+{% if not budget %}
+<!-- Budget Form Only Visible When No Budget is Set -->
+<form method="POST" action="{{ url_for('set_budget') }}" id="budgetForm">
+  <label for="budgetMode">Select budget mode:</label>
+  <select id="budgetMode" name="mode" onchange="toggleBudgetInputs()" required>
+    <option value="current">Current Month</option>
+    <option value="range">Custom Date Range</option>
+    <option value="select">Choose Month & Year</option>
+  </select>
 
-        <div id="range-fields" style="display: none;">
-            <label>From:</label>
-            <input type="date" name="from">
-            <label>To:</label>
-            <input type="date" name="to">
-        </div>
+  <div id="rangeInputs" style="display:none; margin-top: 1rem;">
+    <label>From: <input type="date" name="from"></label>
+    <label>To: <input type="date" name="to"></label>
+  </div>
 
-        <div id="select-fields" style="display: none;">
-            <label>Month:</label>
-            <select name="month">
-                {% for m in range(1,13) %}
-                <option value="{{ m }}">{{ m }}</option>
-                {% endfor %}
-            </select>
-            <label>Year:</label>
-            <input type="number" name="year" min="2000" max="2100">
-        </div>
+  <div id="monthYearInputs" style="display:none; margin-top: 1rem;">
+    <label>Month:
+      <select name="month" id="monthSelect">
+        {% for m in range(1,13) %}
+          <option value="{{m}}">{{ calendar.month_name[m] }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Year:
+      <select name="year" id="yearSelect">
+        {% set current_year = now().year %}
+        {% for y in range(current_year-1, current_year+3) %}
+          <option value="{{ y }}">{{ y }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <p id="duplicateWarning" style="color:red; display:none;">
+      Budget for this month and year already exists! Please choose another.
+    </p>
+  </div>
 
-        <input type="number" name="budget" placeholder="Enter budget" required>
-        <button type="submit" class="btn btn-primary">Set Budget</button>
-    </form>
-</div>
+  <div style="margin-top: 1rem;">
+    <label for="budget">Budget Amount (Rs):</label>
+    <input type="number" name="budget" id="budget" min="0" step="0.01" required>
+  </div>
 
-<script>
-function toggleModeFields(mode) {
-    document.getElementById('range-fields').style.display = (mode === 'range') ? 'block' : 'none';
-    document.getElementById('select-fields').style.display = (mode === 'select') ? 'block' : 'none';
-}
-</script>
+  <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Set Budget</button>
+</form>
+{% endif %}
 
-<!-- Summary -->
 {% if budget %}
-<div class="summary">
-    <p><strong>Mode:</strong> {{ mode_display }}</p>
-    <p><strong>Budget:</strong> Rs. {{ budget }}</p>
-    <p><strong>Total Expenses:</strong> Rs. {{ total }}</p>
-    <p><strong>Remaining:</strong> Rs. {{ budget - total }}</p>
+<hr style="margin: 2rem 0;">
+
+<h2>Expenses for {{ current_month }}</h2>
+<a href="{{ url_for('add') }}" class="btn btn-primary" style="margin-bottom: 1rem;">➕ Add Expenses</a>
+
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="padding: 0.5rem; border: 1px solid #ddd;">Title</th>
+      <th style="padding: 0.5rem; border: 1px solid #ddd;">Quantity</th>
+      <th style="padding: 0.5rem; border: 1px solid #ddd;">Rate</th>
+      <th style="padding: 0.5rem; border: 1px solid #ddd;">Amount (Rs.)</th>
+      <th style="padding: 0.5rem; border: 1px solid #ddd;">Category</th>
+      <th style="padding: 0.5rem; border: 1px solid #ddd;">Date</th>
+      <th style="padding: 0.5rem; border: 1px solid #ddd;">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in expenses %}
+    <tr>
+      <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ e.title }}</td>
+      <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ e.quantity or '-' }}</td>
+      <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ e.rate or '-' }}</td>
+      <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ "%.2f"|format(e.amount) }}</td>
+      <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ e.category }}</td>
+      <td style="padding: 0.5rem; border: 1px solid #ddd;">{{ e.date.strftime('%Y-%m-%d') }}</td>
+      <td style="padding: 0.5rem; border: 1px solid #ddd;">
+        <a href="{{ url_for('edit', id=e.id) }}" class="btn btn-secondary" style="font-size: 0.8rem;">Edit</a>
+        <a href="{{ url_for('delete', id=e.id) }}" onclick="return confirm('Are you sure you want to delete this expense?');" class="btn btn-secondary" style="font-size: 0.8rem;">Delete</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan="7" style="text-align:center; padding: 1rem;">No expenses found for this period.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Buttons placed at the bottom -->
+<div style="display: flex; justify-content: flex-start; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+  <a href="{{ url_for('store_expenses') }}" onclick="return confirm('Are you sure you want to archive and store all current expenses? This will clear current expenses and reset the budget.');" class="btn btn-primary">Store Expenses</a>
+  <a href="{{ url_for('reset_budget') }}" onclick="return confirm('Are you sure you want to reset the current budget? This will clear the budget setup.');" class="btn btn-secondary">Reset Budget</a>
+  <a href="{{ url_for('history') }}" class="btn btn-secondary">View History</a>
 </div>
 {% endif %}
 
-<div class="header-row">
-    <a href="/add" class="btn btn-primary">➕ Add Expense</a>
-    <a href="/history" class="btn btn-secondary">📜 View History</a>
-</div>
+<script>
+function toggleBudgetInputs() {
+  const mode = document.getElementById('budgetMode').value;
+  document.getElementById('rangeInputs').style.display = (mode === 'range') ? 'block' : 'none';
+  document.getElementById('monthYearInputs').style.display = (mode === 'select') ? 'block' : 'none';
+  document.getElementById('duplicateWarning').style.display = 'none';
+}
 
-<!-- Expense Table -->
-<div class="table-container">
-    <table class="expense-table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Qty</th>
-                <th>Rate</th>
-                <th>Amount</th>
-                <th>Category</th>
-                <th>Date</th>
-                <th>Entry Time</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for e in expenses %}
-            <tr>
-                <td>{{ e.title }}</td>
-                <td>{{ e.quantity or '' }}</td>
-                <td>{{ e.rate or '' }}</td>
-                <td>Rs. {{ e.amount }}</td>
-                <td>{{ e.category }}</td>
-                <td>{{ e.date }}</td>
-                <td>{{ e.created_at }}</td>
-                <td>
-                    <div class="action-group">
-                        <a href="/edit/{{ e.id }}" class="btn btn-edit">Edit</a>
-                        <a href="/delete/{{ e.id }}" class="btn btn-danger">Delete</a>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+// Call on page load to apply correct visibility
+window.addEventListener('DOMContentLoaded', toggleBudgetInputs);
+</script>
 {% endblock %}

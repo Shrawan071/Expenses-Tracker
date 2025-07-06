@@ -1,41 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Expense Tracker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-</head>
-<body>
-    <div class="container">
-        <div class="header-row" style="align-items: center; justify-content: space-between;">
-            <h1>Expense Tracker</h1>
-            <button id="dark-mode-toggle" class="btn btn-secondary" type="button">🌙 Dark Mode</button>
-        </div>
-        {% block content %}{% endblock %}
-    </div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Expense Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #f9f9f9;
+      color: #222;
+      transition: background-color 0.3s, color 0.3s;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-    <script>
-      const toggleBtn = document.getElementById('dark-mode-toggle');
-      const body = document.body;
+    .dark-mode {
+      background-color: #121212;
+      color: #eee;
+    }
 
-      // Load saved mode on page load
-      if(localStorage.getItem('darkMode') === 'enabled') {
-        body.classList.add('dark-mode');
-        toggleBtn.textContent = '☀️ Light Mode';
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem 3rem;
+      flex: 1 0 auto;
+    }
+
+    nav {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    nav .nav-left {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    nav .nav-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 0.5rem;
+    }
+
+    nav .nav-right a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    nav .nav-right a:hover {
+      text-decoration: underline;
+    }
+
+    h1 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 2rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-secondary {
+      background-color: #7f8c8d;
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background-color: #6c7a7b;
+    }
+
+    .btn-primary {
+      background-color: #2c3e50;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #1a252f;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .flash-message {
+      margin: 1rem auto;
+      padding: 1rem;
+      background-color: #d9edf7;
+      border: 1px solid #bce8f1;
+      border-radius: 4px;
+      color: #31708f;
+      max-width: 900px;
+    }
+
+    @media (max-width: 600px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      toggleBtn.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        if(body.classList.contains('dark-mode')) {
-          toggleBtn.textContent = '☀️ Light Mode';
-          localStorage.setItem('darkMode', 'enabled');
-        } else {
-          toggleBtn.textContent = '🌙 Dark Mode';
-          localStorage.setItem('darkMode', 'disabled');
-        }
-      });
-    </script>
+      .nav-right {
+        margin-top: 0.5rem;
+      }
+
+      .header-row {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash-message" role="alert" aria-live="assertive">
+        {% for message in messages %}
+          <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <nav>
+    <div class="nav-left">💰 Expense Tracker</div>
+    <div class="nav-right">
+      <a href="{{ url_for('index') }}">🏠 Home</a>
+      <a href="{{ url_for('history') }}">📜 History</a>
+      <button id="dark-mode-toggle" class="btn btn-secondary" type="button" aria-pressed="false" aria-label="Toggle dark mode">🌙 Dark Mode</button>
+    </div>
+  </nav>
+
+  <main class="container" role="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script>
+    const toggleBtn = document.getElementById('dark-mode-toggle');
+    const body = document.body;
+
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      body.classList.add('dark-mode');
+      toggleBtn.textContent = '☀️ Light Mode';
+      toggleBtn.setAttribute('aria-pressed', 'true');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      const isDark = body.classList.contains('dark-mode');
+      toggleBtn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+      toggleBtn.setAttribute('aria-pressed', isDark.toString());
+      localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+    });
+  </script>
 </body>
 </html>

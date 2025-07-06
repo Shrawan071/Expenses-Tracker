@@ -1,17 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
-
 <h2>Edit Expense</h2>
-
-<form method="POST" class="expense-form">
+<form method="POST" class="expense-form" onsubmit="return validateForm()">
     <div class="form-group">
         <label for="title">Title</label>
         <input type="text" name="title" id="title" value="{{ expense.title }}" required>
     </div>
 
     <div class="form-group">
-        <label for="amount">Amount (Rs.)</label>
-        <input type="number" step="0.01" name="amount" id="amount" value="{{ expense.amount }}" required>
+        <label for="quantity">Quantity (optional)</label>
+        <input type="number" step="0.01" name="quantity" id="quantity" placeholder="e.g. 2" min="0" oninput="updateAmount()" value="{{ expense.quantity or '' }}">
+    </div>
+
+    <div class="form-group">
+        <label for="rate">Rate per Unit (optional)</label>
+        <input type="number" step="0.01" name="rate" id="rate" placeholder="e.g. 100" min="0" oninput="updateAmount()" value="{{ expense.rate or '' }}">
+    </div>
+
+    <div class="form-group">
+        <label for="amount">Total Amount <span style="color: red;">*</span></label>
+        <input type="number" step="0.01" name="amount" id="amount" min="0" required value="{{ expense.amount }}">
     </div>
 
     <div class="form-group">
@@ -26,13 +34,50 @@
 
     <div class="form-group">
         <label for="date">Date of Expenditure</label>
-        <input type="date" name="date" id="date" value="{{ expense.date }}" required>
+        <input type="date" name="date" id="date" required value="{{ expense.date }}">
     </div>
 
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">✅ Update Expense</button>
-        <a href="/" class="btn btn-secondary">Cancel</a>
-    </div>
+    <button type="submit" class="btn btn-primary">💾 Update Expense</button>
 </form>
 
+<script>
+function updateAmount() {
+    const qtyField = document.getElementById('quantity');
+    const rateField = document.getElementById('rate');
+    const amountField = document.getElementById('amount');
+
+    const qty = parseFloat(qtyField.value);
+    const rate = parseFloat(rateField.value);
+
+    if (!isNaN(qty) && qty > 0 && !isNaN(rate) && rate > 0) {
+        amountField.value = (qty * rate).toFixed(2);
+        amountField.readOnly = true;
+    } else {
+        amountField.readOnly = false;
+    }
+}
+
+function validateForm() {
+    const qty = parseFloat(document.getElementById('quantity').value);
+    const rate = parseFloat(document.getElementById('rate').value);
+    const amount = parseFloat(document.getElementById('amount').value);
+
+    // If one of qty or rate is provided, both must be present for auto calc
+    if (( !isNaN(qty) && qty > 0 ) || ( !isNaN(rate) && rate > 0 )) {
+        if (isNaN(qty) || isNaN(rate)) {
+            alert("Please enter both Quantity and Rate to auto-calculate Amount.");
+            return false;
+        }
+    }
+
+    if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid Amount.");
+        return false;
+    }
+    return true;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', updateAmount);
+</script>
 {% endblock %}
