@@ -52,6 +52,18 @@
 <hr style="margin: 2rem 0;">
 
 <h2>Expenses for {{ current_month }}</h2>
+
+<div class="summary" style="margin-bottom: 1.5rem;">
+  <p><strong>Budget:</strong> Rs. {{ budget }}</p>
+  <p><strong>Total Expenses:</strong> Rs. {{ total_expense }}</p>
+  <p>
+    <strong>Remaining Balance:</strong>
+    <span class="{% if budget - total_expense >= 0 %}remaining-positive{% else %}remaining-negative{% endif %}">
+      Rs. {{ budget - total_expense }}
+    </span>
+  </p>
+</div>
+
 <a href="{{ url_for('add') }}" class="btn btn-primary" style="margin-bottom: 1rem;">➕ Add Expenses</a>
 
 <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;">

@@ -90,12 +90,13 @@ def archive_expenses():
 def index():
     if should_archive():
         archive_expenses()
+
     budget_entry = Budget.query.first()
-    budget = budget_entry.amount if budget_entry else None
+    budget = budget_entry.amount if budget_entry else 0
     current_month = budget_entry.month if budget_entry else get_current_month()
     mode_display = budget_entry.mode if budget_entry else ""
     expenses = Expense.query.order_by(Expense.date.desc()).all()
-    total = sum(e.amount for e in expenses)
+    total_expense = sum(e.amount for e in expenses)
 
     budgets = Budget.query.with_entities(Budget.month).all()
     histories = ExpenseHistory.query.with_entities(ExpenseHistory.month).all()
@@ -103,7 +104,7 @@ def index():
 
     return render_template('index.html',
                            expenses=expenses,
-                           total=total,
+                           total_expense=total_expense,
                            budget=budget,
                            current_month=current_month,
                            mode_display=mode_display,
@@ -111,6 +112,7 @@ def index():
                            calendar=calendar,
                            str=str,
                            existing_budgets=existing_budgets)
+
 
 @app.route('/check_duplicate', methods=['POST'])
 def check_duplicate():
