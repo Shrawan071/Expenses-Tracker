@@ -1,12 +1,21 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timezone
 import calendar
 import json
+import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
-app.config['SECRET_KEY'] = 'your_secret_key_here'
+
+# --- VERCEL COMPATIBLE DATABASE PATH CONFIGURATION ---
+# Vercel filesystem is read-only except for the /tmp folder.
+# This checks if the app is running in production (Vercel) vs local development.
+if os.environ.get('VERCEL'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/expenses.db'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///expenses.db'
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key_here')
 db = SQLAlchemy(app)
 
 class Expense(db.Model):
@@ -18,7 +27,7 @@ class Expense(db.Model):
     amount = db.Column(db.Float, nullable=False)
     category = db.Column(db.String(50), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 class Budget(db.Model):
     __tablename__ = 'Budget'
@@ -37,6 +46,7 @@ class ExpenseHistory(db.Model):
     budget = db.Column(db.Float, nullable=False)
     mode = db.Column(db.String(10), nullable=False)
 
+# Safely initialize tables without locking up the serverless lifecycle
 with app.app_context():
     db.create_all()
 
@@ -112,7 +122,6 @@ def index():
                            calendar=calendar,
                            str=str,
                            existing_budgets=existing_budgets)
-
 
 @app.route('/check_duplicate', methods=['POST'])
 def check_duplicate():
@@ -254,6 +263,9 @@ def reset_budget():
     db.session.commit()
     flash("Budget has been reset.")
     return redirect('/')
+
+# This exposes 'app' directly at the module level for Vercel's serverless handler
+app = app
 
 if __name__ == '__main__':
     app.run(debug=True)
